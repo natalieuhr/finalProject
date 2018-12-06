@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Input
+{% endblock %}
+
+{% block main %}
+    <table class="table table-hover">
+          <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Species Name</th>
+                <th scope="col">Picture</th>
+                <th scope="col">Average Size</th>
+                <th scope="col">Location</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bird in birds %}
+            <tr>
+                <th scope="row"> {{bird.id}}</th>
+                    <td> {{bird.species}} </td>
+                    <td><img id="catalogimg" src= "/static/pictures/{{ bird.photoLink }} " alt= "{{ bird.name }}" ></td>
+                    <td>{{bird.identifying}}</td>
+                    <td>{{bird.location}}</td>
+                    <td>{{bird.status}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <footer style="font-size: x-small">
+        Sources:
+        {% for bird in birds %}
+            {{bird.Sources}}
+        {% endfor %}
+    </footer>
+{% endblock %}

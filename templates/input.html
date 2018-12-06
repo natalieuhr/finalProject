@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Input
+{% endblock %}
+
+{% block main %}
+<h3> Please select species of honeycreeper you see from the drop down box below.  Your current position will be recorded and information will be used to generate a map of when and where each bird was seen.</h3>
+    <div class="about-border"></div>
+    <br>
+    <form action="/input" method="post">
+        <div class="form-group">
+            Bird:
+            <select name = "bird">
+            {% for bird in birds %}
+                <option name={{bird.species}}>{{bird.species}} </option>
+            {% endfor %}
+            </select>
+            <input type="hidden" id="latitude" value="" name="latitude"/>
+            <input type="hidden" id="longitude" value="lol" name="longitude"/>
+        </div>
+        <br>
+        <button class="btn btn-primary" type="submit">Submit</button>
+        <br><br><br>
+        <p>**Please allow up to 15 seconds after submitting for retriving your location**</p>
+    </form>
+
+    <script>
+        // adapted from https://stackoverflow.com/questions/38427071/javascript-navigator-geolocation
+        document.querySelector("form").onsubmit=function(e){
+            e.preventDefault();
+
+            var options = {
+              enableHighAccuracy: true,
+              timeout: 50000,
+              maximumAge: 0
+            };
+
+            function success(pos) {
+              var crd = pos.coords;
+
+              document.getElementById('latitude').value = crd.latitude;
+              document.getElementById('longitude').value = crd.longitude;
+              document.querySelector("form").submit();
+            }
+
+            function error(err) {
+              console.warn(`ERROR(${err.code}): ${err.message}`);
+            }
+
+            navigator.geolocation.getCurrentPosition(success, error, options);
+
+        };
+    </script>
+{% endblock %}

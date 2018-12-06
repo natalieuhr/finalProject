@@ -1,0 +1,118 @@
+<!DOCTYPE html >
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!-- documentation at http://getbootstrap.com/docs/4.1/, alternative themes at https://bootswatch.com/ -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/styles.css" rel="stylesheet">
+    <title>Map</title>
+    <!---- Adapted from Google Maps' API: https://developers.google.com/maps/documentation/javascript/examples/map-simple-->
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-md navbar-light bg-lightGray border">
+            <a class="navbar-brand" href="/">If Only Darwin Had Come to Hawaii<img src= "/static/pictures/flower.png " alt= "flower" style="width:50px;height:50px;"></span></a>
+            <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbar" data-toggle="collapse" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar">
+                    <ul class="navbar-nav mr-auto mt-2">
+                        <li class="nav-item"><a class="nav-link" href="/honeycreepers">Honeycreepers</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/tarweeds">Tarweeds</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/catalog">Catalog</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/input">Input</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/heatmap">Heatmap</a></li>
+                    </ul>
+            </div>
+        </nav>
+    <div id="map"></div>
+    <script>
+
+    //Adapted from https://developers.google.com/maps/documentation/javascript/examples/marker-simple
+    // Google Map
+    let map;
+
+    // Markers for map
+    let markers = [];
+
+    function initMap() {
+      var map = new google.maps.Map(document.getElementById('map'), {
+        //Make center of the map Cambridge, MA
+        center: {lat: 42.365250, lng:-71.105011},
+        zoom: 12
+      });
+
+
+      update();
+      //Adapted from CS50's 2017 Pset: MASHUP
+      function addMarker(point) {
+
+        // Get Latitude, Longitude, Name, Time, and Picture from database
+        var myLatLng = new google.maps.LatLng(parseFloat(point["latitude"]), parseFloat(point["longitude"]))
+
+        var name = point["name"];
+        var time = point["Time"];
+        var iconImage = "/static/letters/" + point["marker"];
+
+        // Instantiate marker
+        var marker = new google.maps.Marker({
+          position: myLatLng,
+          map: map,
+          icon: {
+            url: iconImage,
+            scaledSize: new google.maps.Size(30, 50),
+          }
+        });
+
+        marker.setMap(map);
+        //when marker is clicked, display information
+        google.maps.event.addListener(marker, 'click', function() {
+          // Upon click, display articles
+          showInfo(marker, name, time);
+        });
+
+        //add marker to array of markers in order to access them later
+        markers.push(marker);
+      }
+
+      // Show info window at marker with content
+      // Info window
+      let info = new google.maps.InfoWindow();
+      function showInfo(marker, name, time) {
+        var contentString = "<p>" + "Species: " + name + "</p><p>"+ "Date and Time: " + time + "</p>";
+        // Set info window's content
+        info.setContent(contentString);
+        // Open info window (if not already open)
+        info.open(map, marker);
+      }
+
+
+      function update() {
+        //get information from the database through jQuery request and call addMarker() function
+        $.getJSON('/update', function(data){
+          for (let i = 0; i < data.length; i++) {
+            addMarker(data[i]);
+          }
+        });
+      }
+    }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgpw_nMugPduhFwQUvLrLhyaLnOlcSS70&callback=initMap">
+    </script>
+  </body>
+</html>
