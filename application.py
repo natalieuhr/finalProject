@@ -44,10 +44,12 @@ def userinput():
         birds = db.execute("SELECT species FROM catalog")
         return render_template("input.html", birds=birds)
     else:
-        # check to make sure input is valid!
+        # store input and check to make sure input is valid
         name = request.form.get("bird")
         lat = request.form.get("latitude")
         lon = request.form.get("longitude")
+        if not name or not lat or not lon:
+                return redirect("/")
         # insert information into markers database
         db.execute("INSERT INTO markers (name, latitude, longitude) VALUES (:name, :lat, :lon)", name=name, lat=lat, lon=lon)
         return redirect("/heatmap")
